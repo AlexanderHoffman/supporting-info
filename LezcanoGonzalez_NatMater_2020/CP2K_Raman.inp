@@ -1,0 +1,154 @@
+&FORCE_EVAL
+  METHOD QS
+  
+  &DFT
+    BASIS_SET_FILE_NAME /data/gent/vo/000/gvo00003/vsc41949/work/cp2k/data_files/BASIS_SETS
+    POTENTIAL_FILE_NAME /data/gent/vo/000/gvo00003/vsc41949/work/cp2k/data_files/GTH_POTENTIALS
+    CHARGE 0    
+
+    &PERIODIC_EFIELD
+      INTENSITY 5.000000e-04
+      POLARISATION 1.0 0.0 0.0
+    &END PERIODIC_EFIELD
+
+    &PRINT
+      &MOMENTS
+        FILENAME =moments.dat
+	REFERENCE COAC
+      &END MOMENTS
+    &END PRINT
+
+    &LOCALIZE
+      &PRINT
+        &WANNIER_CENTERS MEDIUM
+          IONS+CENTERS
+          FILENAME =wannier.xyz
+        &END WANNIER_CENTERS
+        &MOLECULAR_DIPOLES HIGH
+        &END MOLECULAR_DIPOLES
+        &TOTAL_DIPOLE MEDIUM
+          FILENAME =dipole.dat
+          REFERENCE COAC
+          PERIODIC TRUE
+        &END TOTAL_DIPOLE
+      &END PRINT
+    &END LOCALIZE
+                              
+    &QS
+      METHOD GPW                                                                     
+      EPS_DEFAULT 1.0E-10                     
+      EPS_GVG 1.0E-6                           
+      EPS_PGF_ORB 1.0E-6                       
+    &END QS
+
+    &MGRID
+        CUTOFF 400
+        COMMENSURATE TRUE
+        NGRIDS 5
+    &END MGRID
+
+    &XC
+      &XC_FUNCTIONAL PBE
+        &PBE
+          PARAMETRIZATION REVPBE
+        &END PBE 
+      &END XC_FUNCTIONAL
+      &VDW_POTENTIAL
+        POTENTIAL_TYPE PAIR_POTENTIAL          
+        &PAIR_POTENTIAL
+          TYPE DFTD3                           
+          PARAMETER_FILE_NAME /data/gent/vo/000/gvo00003/vsc41949/work/cp2k/data_files/dftd3.dat
+          REFERENCE_FUNCTIONAL revPBE           
+        &END PAIR_POTENTIAL
+      &END VDW_POTENTIAL
+    &END XC
+    
+    &SCF
+      EPS_SCF 1.0E-6                         
+      SCF_GUESS RESTART                      
+      MAX_SCF 200                            
+      &OT
+        MINIMIZER DIIS                       
+        PRECONDITIONER FULL_SINGLE_INVERSE   
+      &END OT
+      &OUTER_SCF
+        EPS_SCF 1.0E-5                       
+        MAX_SCF 50                           
+      &END OUTER_SCF
+    &END SCF
+  &END DFT
+
+  &SUBSYS
+    &TOPOLOGY
+      COORD_FILE_NAME CHA-2BAS-heptaene-init-nvt.xyz
+      COORD_FILE_FORMAT XYZ
+    &END TOPOLOGY
+
+    &CELL
+      PERIODIC XYZ
+      ABC 13.74345683 13.81107989 14.89232862
+      ALPHA_BETA_GAMMA 90.3629448 89.97699899 119.42782801
+    &END CELL
+
+    &KIND C
+      BASIS_SET DZVP-GTH
+      POTENTIAL GTH-PBE-q4
+    &END KIND
+
+    &KIND O
+      BASIS_SET DZVP-GTH
+      POTENTIAL GTH-PBE-q6
+    &END KIND
+
+    &KIND Si
+      BASIS_SET DZVP-GTH
+      POTENTIAL GTH-PBE-q4
+    &END KIND
+
+    &KIND Al
+      BASIS_SET DZVP-GTH
+      POTENTIAL GTH-PBE-q3
+    &END KIND
+
+    &KIND H
+      BASIS_SET DZVP-GTH
+      POTENTIAL GTH-PBE-q1
+    &END KIND
+
+    &KIND P
+      BASIS_SET DZVP-GTH
+      POTENTIAL GTH-PBE-q5
+    &END KIND
+  &END SUBSYS
+&END FORCE_EVAL
+
+&GLOBAL
+  PREFERRED_FFT_LIBRARY FFTSG     
+  PRINT_LEVEL MEDIUM                 
+  PROJECT CHA-2BAS-heptaene-init-Ex
+  RUN_TYPE MD                     
+&END GLOBAL
+
+&MOTION
+  &PRINT
+    &RESTART_HISTORY
+      &EACH
+        MD 2000                 
+      &END EACH
+    &END RESTART_HISTORY
+  &END PRINT
+
+  &MD
+    ENSEMBLE REFTRAJ        
+    STEPS 25000                       
+    TIMESTEP 1.0                    
+    &REFTRAJ     
+      FIRST_SNAPSHOT 2500
+      LAST_SNAPSHOT 12510
+      EVAL_ENERGY_FORCES
+      TRAJ_FILE_NAME CHA-2BAS-heptaene-init-nvt.xyz #Define the reference trajectory
+      STRIDE 2
+    &END REFTRAJ                
+  &END MD
+&END MOTION
+
