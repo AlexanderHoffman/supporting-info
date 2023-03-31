@@ -1,0 +1,25 @@
+General:
+    SYSTEM = DUT8Ni
+    ISTART = 0
+    ISMEAR = 0
+    SIGMA = 0.05
+    EDIFF = 1.0E-10
+    ENCUT = 600 
+    ISYM = 0
+    NELM = 200
+    PREC = Accurate
+    LWAVE = .FALSE.
+    LCHARG = .FALSE.
+    LASPH = .TRUE. 
+ 
+Van der Waals Interaction (vasp 5.3.5 patched verion):
+    IVDW = 12      ! switches between 0:off, 1: DFT-D3 and 2: TS-VDW (default=1)
+
+dynamic:
+    IBRION = 5  ! -1: Fix atoms; 0: MD; 2: ConjGrad relax
+    NSW    = 1000      ! Number electronic steps
+    POTIM  = 0.015
+    NFREE  = 2
+
+parallel:
+    NCORE = 36
