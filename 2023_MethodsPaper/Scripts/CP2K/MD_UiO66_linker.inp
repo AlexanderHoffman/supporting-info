@@ -1,0 +1,147 @@
+&EXT_RESTART
+  RESTART_FILE_NAME UiO66_linker-1.restart
+&END EXT_RESTART
+
+&FORCE_EVAL
+  STRESS_TENSOR ANALYTICAL
+  METHOD QS
+
+  &DFT
+    BASIS_SET_FILE_NAME /dodrio/scratch/users/vsc41949/bin/cp2k_data_files/BASIS_SETS
+    POTENTIAL_FILE_NAME /dodrio/scratch/users/vsc41949/bin/cp2k_data_files/GTH_POTENTIALS
+
+    CHARGE 0
+
+    &QS
+      METHOD GPW
+      EPS_DEFAULT 1.0E-10
+    &END QS
+
+    &MGRID
+        CUTOFF 1000
+        REL_CUTOFF 60
+        NGRIDS 5
+    &END MGRID
+
+    &XC
+      &XC_FUNCTIONAL PBE
+        &PBE
+          PARAMETRIZATION ORIG
+        &END PBE
+      &END XC_FUNCTIONAL
+      &VDW_POTENTIAL
+        POTENTIAL_TYPE PAIR_POTENTIAL
+        &PAIR_POTENTIAL
+          TYPE DFTD3(BJ)
+          PARAMETER_FILE_NAME /dodrio/scratch/users/vsc41949/bin/cp2k_data_files/dftd3.dat
+          REFERENCE_FUNCTIONAL PBE
+        &END PAIR_POTENTIAL
+      &END VDW_POTENTIAL
+    &END XC
+
+    &SCF
+      EPS_SCF 1.0E-6
+      SCF_GUESS RESTART
+      MAX_SCF 25
+      &OT
+        MINIMIZER CG
+        PRECONDITIONER FULL_SINGLE_INVERSE
+      &END OT
+      &OUTER_SCF
+        EPS_SCF 1.0E-6
+        MAX_SCF 5
+      &END OUTER_SCF
+      &PRINT
+        &RESTART
+          ADD_LAST SYMBOLIC
+          &EACH
+            MD 100
+          &END EACH
+        &END RESTART
+      &END PRINT
+    &END SCF
+  &END DFT
+
+  &SUBSYS
+    &TOPOLOGY
+      COORD_FILE_NAME UiO66_linker.xyz
+      COORD_FILE_FORMAT XYZ
+    &END TOPOLOGY
+
+    &CELL
+      PERIODIC XYZ
+      A  20.901978     0.028387     0.000000
+      B   0.028388    20.901974    -0.000008
+      C   0.000000    -0.000008    20.803219
+    &END CELL
+
+    &KIND Zr
+      BASIS_SET TZVP-MOLOPT-SR-GTH
+      POTENTIAL GTH-PBE-q12
+    &END KIND
+
+    &KIND O
+      BASIS_SET TZVP-MOLOPT-GTH
+      POTENTIAL GTH-PBE-q6
+    &END KIND
+
+    &KIND C
+      BASIS_SET TZVP-MOLOPT-GTH
+      POTENTIAL GTH-PBE-q4
+    &END KIND
+
+    &KIND H
+      BASIS_SET TZVP-MOLOPT-GTH
+      POTENTIAL GTH-PBE-q1
+    &END KIND
+  &END SUBSYS
+&END FORCE_EVAL
+
+&GLOBAL
+  PRINT_LEVEL LOW
+  PROJECT UiO66_linker
+  RUN_TYPE MD
+&END GLOBAL
+
+&MOTION
+  &PRINT
+    &TRAJECTORY
+      FORMAT XYZ
+      &EACH
+       MD 1
+      &END EACH
+    &END TRAJECTORY
+    &RESTART
+       ADD_LAST SYMBOLIC
+    &END RESTART
+    &RESTART_HISTORY
+      &EACH
+        MD 10000
+      &END EACH
+    &END RESTART_HISTORY
+  &END PRINT
+  &MD
+    ENSEMBLE NVT
+    STEPS 10000
+    TIMESTEP 0.5
+    TEMPERATURE 300
+    &THERMOSTAT
+      TYPE NOSE
+      REGION GLOBAL
+      &NOSE
+        LENGTH 5
+        YOSHIDA 3
+        TIMECON 100
+        MTS 2
+      &END NOSE
+    &END THERMOSTAT
+    &BAROSTAT
+      PRESSURE 1
+      TIMECON 1000
+    &END BAROSTAT
+    &PRINT
+      FORCE_LAST
+    &END PRINT
+  &END MD
+&END MOTION
+

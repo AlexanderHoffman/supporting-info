@@ -1,0 +1,25 @@
+General:
+    SYSTEM = Name
+    ISTART = 0
+    ISMEAR = 0   
+    SIGMA = 0.05
+    EDIFF = 1.0E-8
+    ENCUT = 600  
+    ISYM = 0
+    SYMPREC = 1.0E-10
+    NELM = 200
+    PREC = Accurate
+    LWAVE = .FALSE.
+    LCHARG = .FALSE.
+    LASPH = .TRUE.  
+
+Van der Waals Interaction:  
+    IVDW = 12
+
+dynamic:
+    IBRION = 2  
+    NSW    = 400   
+    ISIF   = 4
+
+parallel:
+    NCORE = 32

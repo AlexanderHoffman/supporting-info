@@ -1,0 +1,127 @@
+&FORCE_EVAL
+  METHOD QS
+
+  &DFT
+    BASIS_SET_FILE_NAME /data/gent/vo/000/gvo00003/vsc41949/work/cp2k/data_files/BASIS_SETS
+    POTENTIAL_FILE_NAME /data/gent/vo/000/gvo00003/vsc41949/work/cp2k/data_files/GTH_POTENTIALS
+
+    CHARGE 0
+
+    &PERIODIC_EFIELD
+      INTENSITY 5.000000e-04
+      POLARISATION 1.0 0.0 0.0
+    &END PERIODIC_EFIELD
+
+    &PRINT
+      &MOMENTS
+        FILENAME =moments.dat
+        REFERENCE COAC
+      &END MOMENTS
+    &END PRINT
+
+    &QS
+      METHOD GPW
+      EPS_DEFAULT 1.0E-10
+    &END QS
+
+    &MGRID
+        CUTOFF 1000
+        REL_CUTOFF 60
+        NGRIDS 5
+    &END MGRID
+
+    &XC
+      &XC_FUNCTIONAL PBE
+        &PBE
+          PARAMETRIZATION ORIG
+        &END PBE
+      &END XC_FUNCTIONAL
+      &VDW_POTENTIAL
+        POTENTIAL_TYPE PAIR_POTENTIAL
+        &PAIR_POTENTIAL
+          TYPE DFTD3(BJ)
+          PARAMETER_FILE_NAME /data/gent/vo/000/gvo00003/vsc41949/work/cp2k/data_files/dftd3.dat
+          REFERENCE_FUNCTIONAL PBE
+        &END PAIR_POTENTIAL
+      &END VDW_POTENTIAL
+    &END XC
+
+    &SCF
+      EPS_SCF 1.0E-6
+      SCF_GUESS RESTART
+      MAX_SCF 25
+      &OT
+        MINIMIZER DIIS
+        PRECONDITIONER FULL_SINGLE_INVERSE
+      &END OT
+      &OUTER_SCF
+        EPS_SCF 1.0E-6
+        MAX_SCF 5
+      &END OUTER_SCF
+      &PRINT
+        &RESTART
+          ADD_LAST SYMBOLIC
+          &EACH
+            MD 100
+          &END EACH
+        &END RESTART
+      &END PRINT
+    &END SCF
+  &END DFT
+
+  &SUBSYS
+    &TOPOLOGY
+      COORD_FILE_NAME MIL53Al_cp-nvt.xyz
+      COORD_FILE_FORMAT XYZ
+    &END TOPOLOGY
+
+    &CELL
+      PERIODIC XYZ
+      A  13.293632     0.639706     0.000034
+      B   0.878259    19.231613     0.000003
+      C  -0.000069     0.000020    13.199760
+    &END CELL
+
+    &KIND O
+      BASIS_SET TZVP-MOLOPT-GTH
+      POTENTIAL GTH-PBE-q6
+    &END KIND
+
+    &KIND C
+      BASIS_SET TZVP-MOLOPT-GTH
+      POTENTIAL GTH-PBE-q4
+    &END KIND
+
+    &KIND H
+      BASIS_SET TZVP-MOLOPT-GTH
+      POTENTIAL GTH-PBE-q1
+    &END KIND
+
+    &KIND Al
+      BASIS_SET TZVP-MOLOPT-SR-GTH
+      POTENTIAL GTH-PBE-q3
+    &END KIND
+  &END SUBSYS
+&END FORCE_EVAL
+
+&GLOBAL
+  PRINT_LEVEL MEDIUM
+  PROJECT MIL53Al_cp-Ex
+  RUN_TYPE MD
+&END GLOBAL
+
+&MOTION
+  &MD
+    ENSEMBLE REFTRAJ
+    STEPS 25000
+    TIMESTEP 0.5
+    &REFTRAJ
+      FIRST_SNAPSHOT 9990
+      LAST_SNAPSHOT 15000
+      EVAL_ENERGY_FORCES
+      TRAJ_FILE_NAME MIL53Al_cp-nvt.xyz
+      STRIDE 4
+    &END REFTRAJ
+  &END MD
+&END MOTION
+
